@@ -299,11 +299,11 @@ jupyter
 
 | Name | Student ID |
 |------|-----------|
-| [Chua Bi Yun] | [25005610] |
-| [Phong Xiao Wei] | [25005900] |
-| [Chai Xin Tong] | [25005524] |
-| [Choo Kah Lok] | [25005750] |
-| [Joyce Wong Tze Eng] | [25005859 ] |
+| Chua Bi Yun | 25005610 |
+| Phong Xiao Wei | 25005900 |
+| Chai Xin Tong | 25005524 |
+| Choo Kah Lok | 25005750 |
+| Joyce Wong Tze Eng | 25005859 |
 
 ---
 
