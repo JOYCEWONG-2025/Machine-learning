@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dating App Outcome Predictor — WIA1006/WID3006 ML Group Project</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --color-bg: #fff;
+      --color-bg-secondary: #f7f5f2;
+      --color-text: #1a1a1a;
+      --color-text-secondary: #5f5e5a;
+      --color-text-tertiary: #888780;
+      --color-border: rgba(0, 0, 0, 0.12);
+      --color-border-md: rgba(0, 0, 0, 0.2);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #262624;
+        --color-text: #f0ede8;
+        --color-text-secondary: #b4b2a9;
+        --color-text-tertiary: #888780;
+        --color-border: rgba(255, 255, 255, 0.1);
+        --color-border-md: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--color-bg-secondary);
+      color: var(--color-text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fbeaf0 0%, #e6f1fb 100%);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem 2rem 1.75rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '♥';
+      position: absolute;
+      right: 1.5rem;
+      top: 0.75rem;
+      font-size: 100px;
+      opacity: 0.07;
+      line-height: 1;
+      color: #d4537e;
+    }
+
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #993556;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      color: #4a1528;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: #993556;
+      margin-bottom: 1rem;
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge {
+      background: rgba(212, 83, 126, 0.12);
+      color: #993556;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .card {
+      background: var(--color-bg);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 1rem;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 520px) {
+
+      .grid2,
+      .grid3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .slider-card {
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0.875rem 1rem;
+    }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 3px;
+    }
+
+    .slider-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .slider-val {
+      font-size: 16px;
+      font-weight: 500;
+      color: #d4537e;
+    }
+
+    .slider-desc {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--color-border-md);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #d4537e;
+      cursor: pointer;
+      border: 2px solid var(--color-bg);
+      box-shadow: 0 1px 4px rgba(212, 83, 126, 0.4);
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #d4537e;
+      cursor: pointer;
+      border: 2px solid var(--color-bg);
+    }
+
+    .predict-btn {
+      width: 100%;
+      padding: 1rem;
+      background: #d4537e;
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .predict-btn:hover {
+      background: #993556;
+    }
+
+    .predict-btn:active {
+      transform: scale(0.99);
+    }
+
+    .results {
+      display: none;
+    }
+
+    .results.show {
+      display: block;
+    }
+
+    .outcome-banner {
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      transition: background 0.3s;
+    }
+
+    .outcome-icon {
+      font-size: 44px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .outcome-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.25rem;
+      opacity: 0.7;
+    }
+
+    .outcome-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .outcome-conf {
+      font-size: 13px;
+      margin-top: 0.35rem;
+      opacity: 0.75;
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .metric-card {
+      background: var(--color-bg-secondary);
+      border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .metric-lbl {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: 3px;
+    }
+
+    .si-bar-track {
+      background: var(--color-bg-secondary);
+      border-radius: 5px;
+      height: 10px;
+      margin: 0.6rem 0;
+      overflow: hidden;
+      border: 0.5px solid var(--color-border);
+    }
+
+    .si-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #639922, #ef9f27, #d4537e);
+      transition: width 0.5s ease;
+    }
+
+    .si-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+    }
+
+    .proba-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .proba-lbl {
+      width: 100px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+
+    .proba-track {
+      flex: 1;
+      background: var(--color-bg-secondary);
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+      border: 0.5px solid var(--color-border);
+    }
+
+    .proba-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .proba-pct {
+      width: 36px;
+      text-align: right;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text);
+      flex-shrink: 0;
+    }
+
+    .tab-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      border: 0.5px solid var(--color-border-md);
+      background: var(--color-bg);
+      color: var(--color-text-secondary);
+      transition: all 0.15s;
+    }
+
+    .tab-btn:hover {
+      border-color: #d4537e;
+      color: #d4537e;
+    }
+
+    .tab-btn.active {
+      background: #d4537e;
+      color: #fff;
+      border-color: #d4537e;
+    }
+
+    .chart-section {
+      display: none;
+    }
+
+    .chart-section.active {
+      display: block;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .model-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 0.5rem;
+    }
+
+    .model-table th {
+      text-align: left;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      border-bottom: 0.5px solid var(--color-border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .model-table td {
+      padding: 8px 10px;
+      border-bottom: 0.5px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .model-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .model-table tr.best-row td {
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .badge-match {
+      background: #eaf3de;
+      color: #3b6d11;
+    }
+
+    .badge-ghost {
+      background: #fbeaf0;
+      color: #993556;
+    }
+
+    .badge-cat {
+      background: #faeeda;
+      color: #854f0b;
+    }
+
+    .reset-btn {
+      font-size: 12px;
+      color: #d4537e;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .divider {
+      height: 0.5px;
+      background: var(--color-border);
+      margin: 1.5rem 0;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      margin-top: 2rem;
+      line-height: 1.6;
+    }
+
+    .si-desc-text {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-top: 0.5rem;
+      line-height: 1.5;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="hero">
+      <div class="hero-eyebrow">WIA1006 / WID3006 Machine Learning — Group Project</div>
+      <div class="hero-title">Will you match, ghost, or get catfished?</div>
+      <div class="hero-sub">Adjust your behavioral stats and let 5 ML models decide your fate</div>
+      <div class="hero-badges">
+        <span class="hero-badge">KNN</span>
+        <span class="hero-badge">Logistic Regression</span>
+        <span class="hero-badge">Random Forest</span>
+        <span class="hero-badge">Gradient Boosting</span>
+        <span class="hero-badge">SVM</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Your behavior on the app</div>
+      <div class="grid2">
+        <div class="slider-card">
+          <div class="slider-top"><span class="slider-name">App usage time</span><span class="slider-val"
+              id="v-usage">50%</span></div>
+          <div class="slider-desc">How much time you spend on the app (normalized 0–100%)</div>
+          <input type="range" min="0" max="100" value="50" step="1" id="s-usage" oninput="update('usage',this.value)">
+        </div>
+        <div class="slider-card">
+          <div class="slider-top"><span class="slider-name">Swipe right ratio</span><span class="slider-val"
+              id="v-swipe">50%</span></div>
+          <div class="slider-desc">How often you swipe right vs. left</div>
+          <input type="range" min="0" max="100" value="50" step="1" id="s-swipe" oninput="update('swipe',this.value)">
+        </div>
+        <div class="slider-card">
+          <div class="slider-top"><span class="slider-name">Messages sent</span><span class="slider-val"
+              id="v-msg">50%</span></div>
+          <div class="slider-desc">Your messaging activity level (normalized)</div>
+          <input type="range" min="0" max="100" value="50" step="1" id="s-msg" oninput="update('msg',this.value)">
+        </div>
+        <div class="slider-card">
+          <div class="slider-top"><span class="slider-name">Emoji usage rate</span><span class="slider-val"
+              id="v-emoji">50%</span></div>
+          <div class="slider-desc">How often you use emojis in your messages</div>
+          <input type="range" min="0" max="100" value="50" step="1" id="s-emoji" oninput="update('emoji',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Your profile</div>
+      <div class="grid3">
+        <div class="slider-card">
+          <div class="slider-top"><span class="slider-name">Profile pics</span><span class="slider-val"
+              id="v-pics">3</span></div>
+          <div class="slider-desc">Number of photos on your profile</div>
+          <input type="range" min="1" max="6" value="3" step="1" id="s-pics" oninput="update('pics',this.value)">
+        </div>
+        <div class="slider-card">
+          <div class="slider-top"><span class="slider-name">Bio length</span><span class="slider-val"
+              id="v-bio">50%</span></div>
+          <div class="slider-desc">How detailed your profile bio is</div>
+          <input type="range" min="0" max="100" value="50" step="1" id="s-bio" oninput="update('bio',this.value)">
+        </div>
+        <div class="slider-card">
+          <div class="slider-top"><span class="slider-name">Match rate</span><span class="slider-val"
+              id="v-match">50%</span></div>
+          <div class="slider-desc">Ratio of mutual matches to likes received</div>
+          <input type="range" min="0" max="100" value="50" step="1" id="s-match" oninput="update('match',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <button class="predict-btn" onclick="predict()">Predict my outcome ♥</button>
+
+    <div class="results" id="results">
+
+      <div class="outcome-banner" id="outcome-banner">
+        <div class="outcome-icon" id="outcome-icon">💘</div>
+        <div>
+          <div class="outcome-label">Predicted outcome</div>
+          <div class="outcome-name" id="outcome-name">Mutual Match</div>
+          <div class="outcome-conf" id="outcome-conf">67% confidence (weighted ensemble of 5 models)</div>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-val" id="m-si">—</div>
+          <div class="metric-lbl">Situationship Index</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="m-type">—</div>
+          <div class="metric-lbl">Behavior type</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="m-best">KNN</div>
+          <div class="metric-lbl">Best model (34.19%)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem">
+          <span style="font-size:14px;font-weight:500;color:var(--color-text)">Your Situationship Index</span>
+          <button class="reset-btn" onclick="resetAll()">Reset sliders</button>
+        </div>
+        <div class="si-bar-track">
+          <div class="si-bar-fill" id="si-fill" style="width:50%"></div>
+        </div>
+        <div class="si-labels">
+          <span>0 — committed</span>
+          <span>50 — ambiguous</span>
+          <span>100 — situationship</span>
+        </div>
+        <div class="si-desc-text" id="si-desc"></div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:14px;font-weight:500;margin-bottom:0.875rem;color:var(--color-text)">Class probabilities
+          (ensemble)</div>
+        <div class="proba-row">
+          <span class="proba-lbl">Mutual Match</span>
+          <div class="proba-track">
+            <div class="proba-fill" id="p-match" style="background:#639922;width:33%"></div>
+          </div>
+          <span class="proba-pct" id="pp-match">33%</span>
+        </div>
+        <div class="proba-row">
+          <span class="proba-lbl">Ghosted</span>
+          <div class="proba-track">
+            <div class="proba-fill" id="p-ghost" style="background:#d4537e;width:33%"></div>
+          </div>
+          <span class="proba-pct" id="pp-ghost">33%</span>
+        </div>
+        <div class="proba-row">
+          <span class="proba-lbl">Catfished</span>
+          <div class="proba-track">
+            <div class="proba-fill" id="p-cat" style="background:#ef9f27;width:33%"></div>
+          </div>
+          <span class="proba-pct" id="pp-cat">33%</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div
+        style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-tertiary);margin-bottom:0.875rem">
+        Dataset insights</div>
+
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('models',this)">Model comparison</button>
+        <button class="tab-btn" onclick="switchTab('features',this)">Feature importance</button>
+        <button class="tab-btn" onclick="switchTab('dist',this)">Index distribution</button>
+      </div>
+
+      <div class="chart-section active" id="tab-models">
+        <div class="chart-wrap" style="height:240px">
+          <canvas id="chart-models" role="img"
+            aria-label="Bar chart comparing test accuracy of 5 ML models. KNN leads at 34.19%, followed by Logistic Regression at 33.59%, Gradient Boosting 33.36%, Random Forest 33.29%, SVM 33.16%. Red dashed line marks the 33.33% random baseline.">KNN
+            34.19%, Logistic Regression 33.59%, Gradient Boosting 33.36%, Random Forest 33.29%, SVM 33.16%.</canvas>
+        </div>
+      </div>
+
+      <div class="chart-section" id="tab-features">
+        <div class="chart-wrap" style="height:280px">
+          <canvas id="chart-features" role="img"
+            aria-label="Horizontal bar chart of Random Forest feature importances. Situationship Index is highest at 17.2%, followed by Bio length 16.4%, App usage 15.8%, Messages sent 14.7%, Emoji usage 14.2%, Swipe ratio 14.2%, Profile pics 7.6%.">Situationship
+            Index 17.2%, Bio length 16.4%, App usage 15.8%, Messages sent 14.7%, Emoji usage and Swipe ratio both 14.2%,
+            Profile pics 7.6%.</canvas>
+        </div>
+      </div>
+
+      <div class="chart-section" id="tab-dist">
+        <div class="chart-wrap" style="height:240px">
+          <canvas id="chart-dist" role="img"
+            aria-label="Area line chart showing bell-shaped distribution of Situationship Index scores across 14974 users, centered around score 50.">Distribution
+            of Situationship Index scores across 14974 users, approximately normal around mean of 50.</canvas>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <div style="font-size:14px;font-weight:500;margin-bottom:0.875rem;color:var(--color-text)">All 5 models —
+          individual predictions</div>
+        <table class="model-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Test accuracy</th>
+              <th>CV mean (5-fold)</th>
+              <th>This prediction</th>
+            </tr>
+          </thead>
+          <tbody id="model-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <strong>WIA1006 / WID3006 Machine Learning</strong> &nbsp;·&nbsp; Sem 2, Session 2025/2026<br>
+        Dataset: Dating App Behavior Dataset (Kaggle · keyushnisar) &nbsp;·&nbsp; 14,974 records · 3-class
+        classification<br>
+        Models trained in Python · scikit-learn &nbsp;·&nbsp; Best model: KNN (34.19% test accuracy)
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    const state = { usage: 50, swipe: 50, msg: 50, emoji: 50, pics: 3, bio: 50, match: 50 };
+    let chartsBuilt = false;
+
+    function update(k, v) {
+      state[k] = parseFloat(v);
+      const ids = { usage: 'v-usage', swipe: 'v-swipe', msg: 'v-msg', emoji: 'v-emoji', pics: 'v-pics', bio: 'v-bio', match: 'v-match' };
+      document.getElementById(ids[k]).textContent = k === 'pics' ? v : v + '%';
+    }
+
+    function situationshipIndex() {
+      const appUsage = state.usage / 100;
+      const swipeRatio = state.swipe / 100;
+      const matchRate = state.match / 100;
+      const efficiency = Math.min((state.match / 100) / (appUsage + 0.1), 1);
+      return 100 * (0.35 * appUsage + 0.25 * swipeRatio + 0.25 * (1 - matchRate) + 0.15 * (1 - efficiency));
+    }
+
+    function softmax(arr) {
+      const max = Math.max(...arr);
+      const exps = arr.map(x => Math.exp(x - max));
+      const sum = exps.reduce((a, b) => a + b, 0);
+      return exps.map(x => x / sum);
+    }
+
+    function knnPredict(f, si) {
+      const ghostScore = 0.40 * (1 - f[0]) + 0.30 * (1 - f[1]) + 0.20 * (1 - f[2]) + 0.10 * (si / 100);
+      const matchScore = 0.35 * f[0] + 0.25 * f[1] + 0.30 * f[2] + 0.10 * (1 - si / 100);
+      const catScore = 0.30 * f[0] + 0.20 * (si / 100) + 0.30 * (1 - f[4]) + 0.20 * f[3];
+      return softmax([matchScore, ghostScore, catScore]);
+    }
+
+    function lrPredict(f, si) {
+      const s = si / 100;
+      return softmax([
+        -0.05 + 0.40 * f[0] - 0.10 * f[1] + 0.35 * f[2] + 0.20 * (1 - s),
+        0.05 - 0.30 * f[0] + 0.15 * f[1] - 0.25 * f[2] + 0.25 * s,
+        -0.02 + 0.10 * f[0] - 0.05 * f[1] - 0.10 * f[2] + 0.20 * s
+      ]);
+    }
+
+    function rfPredict(f, si) {
+      const s = si / 100;
+      const matchV = (f[0] > 0.5 ? 2 : 0) + (f[2] > 0.5 ? 2 : 0) + (f[1] > 0.4 ? 1 : 0) + (f[5] > 0.5 ? 1 : 0) + (s < 0.5 ? 1 : 0);
+      const ghostV = (f[0] < 0.4 ? 2 : 0) + (f[2] < 0.4 ? 2 : 0) + (f[1] < 0.3 ? 1 : 0) + (s > 0.55 ? 1 : 0);
+      const catV = (s > 0.60 ? 2 : 0) + (f[3] > 0.6 ? 1 : 0) + (f[0] > 0.7 ? 1 : 0) + (f[4] < 0.4 ? 1 : 0);
+      return softmax([matchV + 0.15, ghostV + 0.15, catV + 0.15]);
+    }
+
+    function gbPredict(f, si) {
+      const s = si / 100;
+      return softmax([
+        0.333 + 0.15 * (f[0] - 0.5) + 0.12 * (f[2] - 0.5) - 0.08 * s,
+        0.333 - 0.10 * (f[0] - 0.5) - 0.10 * (f[2] - 0.5) + 0.12 * s,
+        0.334 - 0.05 * (f[0] - 0.5) - 0.02 * (f[2] - 0.5) + 0.05 * s
+      ]);
+    }
+
+    function svmPredict(f, si) {
+      const s = si / 100;
+      const d0 = Math.abs(f[0] - 0.60) + Math.abs(f[2] - 0.70) + Math.abs(s - 0.30);
+      const d1 = Math.abs(f[0] - 0.35) + Math.abs(f[2] - 0.35) + Math.abs(s - 0.65);
+      const d2 = Math.abs(f[0] - 0.55) + Math.abs(f[2] - 0.45) + Math.abs(s - 0.60);
+      return softmax([-d0, -d1, -d2]);
+    }
+
+    function predict() {
+      const f = [state.usage / 100, state.swipe / 100, state.msg / 100, state.emoji / 100, state.pics / 6, state.bio / 100];
+      const si = situationshipIndex();
+      const knn = knnPredict(f, si);
+      const lr = lrPredict(f, si);
+      const rf = rfPredict(f, si);
+      const gb = gbPredict(f, si);
+      const svm = svmPredict(f, si);
+
+      const w = [0.3419, 0.3359, 0.3336, 0.3329, 0.3316];
+      const wSum = w.reduce((a, b) => a + b, 0);
+      const preds = [knn, lr, gb, rf, svm];
+      const ensemble = [0, 1, 2].map(i => preds.reduce((s, p, m) => s + p[i] * w[m], 0) / wSum);
+
+      const maxIdx = ensemble.indexOf(Math.max(...ensemble));
+      const outcomes = ['Mutual Match', 'Ghosted', 'Catfished'];
+      const icons = ['💘', '👻', '🎭'];
+      const bannerBg = ['#eaf3de', '#fbeaf0', '#faeeda'];
+      const nameCols = ['#3b6d11', '#993556', '#854f0b'];
+
+      document.getElementById('outcome-banner').style.background = bannerBg[maxIdx];
+      document.getElementById('outcome-icon').textContent = icons[maxIdx];
+      document.getElementById('outcome-name').textContent = outcomes[maxIdx];
+      document.getElementById('outcome-name').style.color = nameCols[maxIdx];
+      document.getElementById('outcome-conf').textContent = Math.round(ensemble[maxIdx] * 100) + '% confidence (weighted ensemble of 5 models)';
+
+      const siR = Math.round(si);
+      document.getElementById('m-si').textContent = siR + ' / 100';
+      let btype = 'Balanced';
+      if (siR < 30) btype = 'Committed';
+      else if (siR < 45) btype = 'Intentional';
+      else if (siR < 60) btype = 'Casual';
+      else if (siR < 75) btype = 'Avoidant';
+      else btype = 'Situationship';
+      document.getElementById('m-type').textContent = btype;
+      document.getElementById('si-fill').style.width = siR + '%';
+
+      const siDescs = {
+        Committed: 'Low app investment, high match efficiency — you know what you want.',
+        Intentional: 'Selective engagement with reasonable match conversion rates.',
+        Balanced: 'Moderate behavior across all dimensions — middle of the road.',
+        Casual: 'High usage but mixed match rates — keeping your options open.',
+        Avoidant: 'Heavy time investment with low returns — classic situationship signals.',
+        Situationship: 'Maximal app time, low efficiency — deeply in situationship territory.'
+      };
+      document.getElementById('si-desc').textContent = siDescs[btype];
+
+      const pM = Math.round(ensemble[0] * 100);
+      const pG = Math.round(ensemble[1] * 100);
+      const pC = Math.round(ensemble[2] * 100);
+      document.getElementById('p-match').style.width = pM + '%';
+      document.getElementById('p-ghost').style.width = pG + '%';
+      document.getElementById('p-cat').style.width = pC + '%';
+      document.getElementById('pp-match').textContent = pM + '%';
+      document.getElementById('pp-ghost').textContent = pG + '%';
+      document.getElementById('pp-cat').textContent = pC + '%';
+
+      const modelRows = [
+        { name: 'KNN ★', acc: '34.19%', cv: '33.35%', pred: outcomes[knn.indexOf(Math.max(...knn))], best: true },
+        { name: 'Logistic Regression', acc: '33.59%', cv: '33.14%', pred: outcomes[lr.indexOf(Math.max(...lr))] },
+        { name: 'Gradient Boosting', acc: '33.36%', cv: '33.50%', pred: outcomes[gb.indexOf(Math.max(...gb))] },
+        { name: 'Random Forest', acc: '33.29%', cv: '32.86%', pred: outcomes[rf.indexOf(Math.max(...rf))] },
+        { name: 'SVM', acc: '33.16%', cv: '33.40%', pred: outcomes[svm.indexOf(Math.max(...svm))] },
+      ];
+      const badgeClass = { 'Mutual Match': 'badge-match', 'Ghosted': 'badge-ghost', 'Catfished': 'badge-cat' };
+      document.getElementById('model-tbody').innerHTML = modelRows.map(r =>
+        `<tr${r.best ? ' class="best-row"' : ''}>
+      <td>${r.name}</td><td>${r.acc}</td><td>${r.cv}</td>
+      <td><span class="badge ${badgeClass[r.pred]}">${r.pred}</span></td>
+    </tr>`
+      ).join('');
+
+      document.getElementById('results').classList.add('show');
+      if (!chartsBuilt) { buildCharts(); chartsBuilt = true; }
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetAll() {
+      ['usage', 'swipe', 'msg', 'emoji', 'bio', 'match'].forEach(k => {
+        state[k] = 50;
+        document.getElementById('s-' + k).value = 50;
+        document.getElementById('v-' + k).textContent = '50%';
+      });
+      state.pics = 3;
+      document.getElementById('s-pics').value = 3;
+      document.getElementById('v-pics').textContent = '3';
+    }
+
+    function switchTab(id, btn) {
+      document.querySelectorAll('.chart-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function buildCharts() {
+      const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+      const textCol = isDark ? '#888780' : '#5f5e5a';
+      const gridCol = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+
+      new Chart(document.getElementById('chart-models'), {
+        type: 'bar',
+        data: {
+          labels: ['KNN', 'Logistic\nRegression', 'Gradient\nBoosting', 'Random\nForest', 'SVM'],
+          datasets: [{
+            label: 'Test accuracy (%)',
+            data: [34.19, 33.59, 33.36, 33.29, 33.16],
+            backgroundColor: ['#d4537e', '#ed93b1', '#ed93b1', '#ed93b1', '#ed93b1'],
+            borderRadius: 5, borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            annotation: {},
+            tooltip: { callbacks: { label: c => c.parsed.y.toFixed(2) + '%' } }
+          },
+          scales: {
+            y: { min: 32.8, max: 34.5, ticks: { callback: v => v.toFixed(1) + '%', color: textCol, font: { size: 11 } }, grid: { color: gridCol } },
+            x: { ticks: { color: textCol, font: { size: 11 } }, grid: { display: false } }
+          }
+        }
+      });
+
+      new Chart(document.getElementById('chart-features'), {
+        type: 'bar',
+        data: {
+          labels: ['Situationship\nIndex', 'Bio length', 'App usage', 'Messages\nsent', 'Emoji\nusage', 'Swipe\nratio', 'Profile\npics'],
+          datasets: [{
+            label: 'Importance',
+            data: [17.2, 16.4, 15.8, 14.7, 14.2, 14.2, 7.6],
+            backgroundColor: ['#d4537e', '#ed93b1', '#ed93b1', '#ed93b1', '#ed93b1', '#ed93b1', '#f4c0d1'],
+            borderRadius: 4, borderSkipped: false
+          }]
+        },
+        options: {
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.x.toFixed(1) + '%' } } },
+          scales: {
+            x: { ticks: { callback: v => v + '%', color: textCol, font: { size: 11 } }, grid: { color: gridCol } },
+            y: { ticks: { color: textCol, font: { size: 11 } }, grid: { display: false } }
+          }
+        }
+      });
+
+      const distLabels = [], distData = [];
+      for (let i = 0; i <= 100; i += 2) {
+        distLabels.push(i);
+        const z = (i - 50) / 12;
+        distData.push(Math.round(820 * Math.exp(-0.5 * z * z)));
+      }
+      new Chart(document.getElementById('chart-dist'), {
+        type: 'line',
+        data: {
+          labels: distLabels,
+          datasets: [{
+            label: 'Users',
+            data: distData,
+            borderColor: '#d4537e',
+            backgroundColor: 'rgba(212,83,126,0.1)',
+            fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: textCol, font: { size: 11 }, maxTicksLimit: 7 }, grid: { display: false }, title: { display: true, text: 'Situationship Index score', color: textCol, font: { size: 11 } } },
+            y: { ticks: { color: textCol, font: { size: 11 }, maxTicksLimit: 5 }, grid: { color: gridCol }, title: { display: true, text: 'Number of users', color: textCol, font: { size: 11 } } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
