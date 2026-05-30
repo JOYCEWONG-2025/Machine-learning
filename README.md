@@ -5,7 +5,7 @@
 
 A machine learning project that predicts dating app match outcomes — **Ghosted**, **Mutual Match**, or **Catfished** — using behavioral and demographic features from a synthetic dating app dataset.
 
-🔗 **[Live Interactive Dashboard →]((https://dating-predictor-ml.netlify.app/))**
+🔗 **[Live Interactive Dashboard →][https://dating-predictor-ml.netlify.app/]**
 
 ---
 
