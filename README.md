@@ -239,7 +239,7 @@ Where:
 
 A fully deployed interactive dashboard built with HTML/CSS/JavaScript + Chart.js.
 
-**🔗 Live URL: [https://incomparable-beignet-c6453e.netlify.app/](https://incomparable-beignet-c6453e.netlify.app/)**
+**🔗 Live URL: [https://dating-predictor-ml.netlify.app/]**
 
 **Features:**
 - 🎚️ Behavioral sliders for all 6 input features
@@ -299,11 +299,11 @@ jupyter
 
 | Name | Student ID |
 |------|-----------|
-| [Member 1] | [ID] |
-| [Member 2] | [ID] |
-| [Member 3] | [ID] |
-| [Member 4] | [ID] |
-| [Member 5] | [ID] |
+| [Chua Bi Yun] | [25005610] |
+| [Phong Xiao Wei] | [25005900] |
+| [Chai Xin Tong] | [25005524] |
+| [Choo Kah Lok] | [25005750] |
+| [Joyce Wong Tze Eng] | [25005859 ] |
 
 ---
 
